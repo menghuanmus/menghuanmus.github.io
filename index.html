@@ -5,21 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>百闻牌模拟器</title>
   <!-- CSS 模块 -->
-  <link rel="stylesheet" href="css/reset.css?v=v0.5">
-  <link rel="stylesheet" href="css/center-bar.css?v=v0.5">
-  <link rel="stylesheet" href="css/field.css?v=v0.5">
-  <link rel="stylesheet" href="css/chat.css?v=v0.5">
-  <link rel="stylesheet" href="css/room.css?v=v0.5">
-  <link rel="stylesheet" href="css/systems.css?v=v0.5">
-  <link rel="stylesheet" href="css/special-effects.css?v=v0.5">
-  <link rel="stylesheet" href="css/card-flight.css?v=v0.5">
-  <link rel="stylesheet" href="css/renyin.css?v=v0.5">
-  <link rel="stylesheet" href="css/show-hand.css?v=v0.5">
-  <link rel="stylesheet" href="css/charge.css?v=v0.5">
-  <link rel="stylesheet" href="css/bonus-panel.css?v=v0.5">
-  <link rel="stylesheet" href="css/presets.css?v=v0.5">
-  <link rel="stylesheet" href="css/auth.css?v=v0.5">
-  <link rel="stylesheet" href="css/mobile.css?v=v0.5">
+  <link rel="stylesheet" href="css/reset.css?v=v0.5.1">
+  <link rel="stylesheet" href="css/center-bar.css?v=v0.5.1">
+  <link rel="stylesheet" href="css/field.css?v=v0.5.1">
+  <link rel="stylesheet" href="css/chat.css?v=v0.5.1">
+  <link rel="stylesheet" href="css/room.css?v=v0.5.1">
+  <link rel="stylesheet" href="css/systems.css?v=v0.5.1">
+  <link rel="stylesheet" href="css/special-effects.css?v=v0.5.1">
+  <link rel="stylesheet" href="css/card-flight.css?v=v0.5.1">
+  <link rel="stylesheet" href="css/renyin.css?v=v0.5.1">
+  <link rel="stylesheet" href="css/show-hand.css?v=v0.5.1">
+  <link rel="stylesheet" href="css/charge.css?v=v0.5.1">
+  <link rel="stylesheet" href="css/bonus-panel.css?v=v0.5.1">
+  <link rel="stylesheet" href="css/presets.css?v=v0.5.1">
+  <link rel="stylesheet" href="css/auth.css?v=v0.5.1">
+  <link rel="stylesheet" href="css/mobile.css?v=v0.5.1">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 </head>
@@ -935,7 +935,7 @@
   <!-- JS 模块（按依赖顺序加载） -->
   <!-- 卡牌数据从服务器加载：正式服 /ws/data/cards.js，测试服 /ws-test/data/cards.js。
        更新卡牌数据只需把 data/cards.js 上传到服务器，刷新页面即生效。
-       本地离线调试时可临时改回 <script src="data/cards.js?v=v0.5"></script> -->
+       本地离线调试时可临时改回 <script src="data/cards.js?v=v0.5.1"></script> -->
   <script>
     (function() {
       var isTest = false;
@@ -950,32 +950,33 @@
       document.write('<script src="' + src + '" onerror="console.error(\'卡牌数据加载失败，请检查服务器 cards.js 是否已部署\')"><\/script>');
     })();
   </script>
-  <script src="js/constants.js?v=v0.5"></script>
-  <script src="js/card-db.js?v=v0.5"></script>
-  <script src="js/card-tooltip.js?v=v0.5"></script>
-  <script src="js/card-flight.js?v=v0.5"></script>
-  <script src="js/network.js?v=v0.5"></script>
-  <script src="js/game-core.js?v=v0.5"></script>
-  <script src="js/chat.js?v=v0.5"></script>
-  <script src="js/dice.js?v=v0.5"></script>
-  <script src="js/card-deck.js?v=v0.5"></script>
-  <script src="js/shikigami-book.js?v=v0.5"></script>
-  <script src="js/data-io.js?v=v0.5"></script>
-  <script src="js/special-effects.js?v=v0.5"></script>
-  <script src="js/shop.js?v=v0.5"></script>
-  <script src="js/oracle.js?v=v0.5"></script>
-  <script src="js/renyin.js?v=v0.5"></script>
-  <script src="js/show-hand.js?v=v0.5"></script>
-  <script src="js/charge.js?v=v0.5"></script>
-  <script src="js/bonus-panel.js?v=v0.5"></script>
-  <script src="js/presets.js?v=v0.5"></script>
-  <script src="js/my-lib.js?v=v0.5"></script>
-  <script src="js/auth.js?v=v0.5"></script>
+  <script src="js/constants.js?v=v0.5.1"></script>
+  <script src="js/card-db.js?v=v0.5.1"></script>
+  <script src="js/card-tooltip.js?v=v0.5.1"></script>
+  <script src="js/card-flight.js?v=v0.5.1"></script>
+  <script src="js/network.js?v=v0.5.1"></script>
+  <script src="js/game-core.js?v=v0.5.1"></script>
+  <script src="js/chat.js?v=v0.5.1"></script>
+  <script src="js/dice.js?v=v0.5.1"></script>
+  <script src="js/card-deck.js?v=v0.5.1"></script>
+  <script src="js/shikigami-book.js?v=v0.5.1"></script>
+  <script src="js/data-io.js?v=v0.5.1"></script>
+  <script src="js/special-effects.js?v=v0.5.1"></script>
+  <script src="js/shop.js?v=v0.5.1"></script>
+  <script src="js/oracle.js?v=v0.5.1"></script>
+  <script src="js/renyin.js?v=v0.5.1"></script>
+  <script src="js/show-hand.js?v=v0.5.1"></script>
+  <script src="js/charge.js?v=v0.5.1"></script>
+  <script src="js/bonus-panel.js?v=v0.5.1"></script>
+  <script src="js/presets.js?v=v0.5.1"></script>
+  <script src="js/my-lib.js?v=v0.5.1"></script>
+  <script src="js/auth.js?v=v0.5.1"></script>
 
   </div><!-- /#game-view -->
 
 </body>
 </html>
+
 
 
 
