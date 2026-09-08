@@ -232,8 +232,8 @@
     /* ================================================================
        联机权限锁定样式
        ================================================================ */
-    /* 牌库按钮已解锁，双方均可操作 */
-    .player-zone--locked .btn-deck:not([data-action="hand"]):not([data-action="deck"]):not(.btn-deck--grave) {
+    /* 牌库按钮已解锁，双方均可操作（非观战锁定区：仅手牌/牌库/坟场/启悟区放行彩色） */
+    .player-zone--locked:not([data-locked="all"]) .btn-deck:not([data-action="hand"]):not([data-action="deck"]):not(.btn-deck--grave):not([data-action="oracle-zone"]) {
       filter: grayscale(0.6);
     }
     /* 观战模式：玩家区域全面锁定（含动态创建的元素） */
@@ -243,8 +243,8 @@
       pointer-events: none !important;
       opacity: 0.45;
     }
-    /* 观战可查看的按钮（手牌/牌库/坟场入口）放行，其余牌库操作按钮仍拦截 */
-    .player-zone--locked[data-locked="all"] .btn-deck:not([data-action="hand"]):not([data-action="deck"]):not(.btn-deck--grave) {
+    /* 观战可查看的按钮（手牌/牌库/坟场/启悟区入口）放行，其余牌库操作按钮仍拦截 */
+    .player-zone--locked[data-locked="all"] .btn-deck:not([data-action="hand"]):not([data-action="deck"]):not(.btn-deck--grave):not([data-action="oracle-zone"]) {
       pointer-events: none !important;
       opacity: 0.45;
       cursor: not-allowed;

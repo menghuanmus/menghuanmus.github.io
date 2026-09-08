@@ -386,6 +386,10 @@
         document.querySelectorAll('.btn-deck[data-action="hand"], .btn-deck[data-action="deck"]').forEach(function(el) {
           el.removeAttribute('data-locked'); el.disabled = false; el.style.opacity = ''; el.style.cursor = '';
         });
+        // 观众可以打开启悟区查看（内部操作按钮仅本人可见，观众只读）
+        document.querySelectorAll('.btn-deck--oracle[data-action="oracle-zone"]').forEach(function(el) {
+          el.removeAttribute('data-locked'); el.disabled = false; el.style.opacity = ''; el.style.cursor = '';
+        });
         // 观众可以打开幻境/效果面板查看（内部输入框保持只读，添加按钮已隐藏）
         document.querySelectorAll('.btn-mobile-realm').forEach(function(el) {
           el.removeAttribute('data-locked'); el.disabled = false; el.style.opacity = ''; el.style.cursor = '';

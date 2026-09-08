@@ -65,13 +65,24 @@
       syncOracleToPeer(playerId);
     }
 
-    /** 打开启悟弹窗（仅可查看自己的启悟区，对手启悟区不可见） */
+    /** 观众只读：隐藏启悟弹窗内全部操作区（保留列表查看 + 关闭按钮） */
+    function _applyOracleSpecLock() {
+      const spec = (typeof isSpectator !== 'undefined') ? isSpectator : false;
+      ['#oracle-action-toggles', '.oracle-quick-row', '.oracle-input-row'].forEach(function(sel) {
+        const el = document.querySelector(sel);
+        if (el) el.style.display = spec ? 'none' : '';
+      });
+    }
+
+    /** 打开启悟弹窗（本人可查看/操作；观众可查看双方启悟区，只读） */
     function openOracleDialog(playerId) {
       // 检查是否有权查看
       const own = (typeof isViewingOwnCards === 'function') ? isViewingOwnCards(playerId) : true;
       const solo = (typeof isSoloMode !== 'undefined') ? isSoloMode : false;
-      if (!own && !solo) return;
+      const spec = (typeof isSpectator !== 'undefined') ? isSpectator : false;
+      if (!own && !solo && !spec) return;
       _activeOraclePlayer = playerId;
+      _applyOracleSpecLock();
       renderOracleCards(playerId);
       oracleOverlay.hidden = false;
     }
@@ -87,6 +98,9 @@
       const cards = oracleHands[playerId] || [];
       const own = (typeof isViewingOwnCards === 'function') ? isViewingOwnCards(playerId) : true;
       const solo = (typeof isSoloMode !== 'undefined') ? isSoloMode : false;
+      const spec = (typeof isSpectator !== 'undefined') ? isSpectator : false;
+      // 可查看详情：本人 / 单人 / 观众（观众只看，不做任何操作）
+      const canView = own || solo || spec;
       oracleCardsList.innerHTML = '';
       if (!cards.length) return;
 
@@ -99,13 +113,13 @@
         const info = document.createElement('div');
         info.className = 'oracle-card-item__info';
         // 存储灵咒数据供浮窗显示
-        if ((own || solo) && card.curses && card.curses.length) {
+        if (canView && card.curses && card.curses.length) {
           info.dataset.cardCurses = JSON.stringify(card.curses);
         }
 
         const nameEl = document.createElement('span');
         nameEl.className = 'oracle-card-item__name card-name';
-        if (own || solo) {
+        if (canView) {
           nameEl.textContent = card.name || '(未命名)';
           nameEl.value = card.name || '';
         } else {
@@ -115,15 +129,15 @@
         info.appendChild(nameEl);
 
         // 堆叠层数显示
-        if ((own || solo) && card._maxStack > 0) {
+        if (canView && card._maxStack > 0) {
           const stackSpan = document.createElement('span');
           stackSpan.style.cssText = 'font-size:11px;color:#c0a860;margin-left:4px;white-space:nowrap;';
           stackSpan.textContent = (card._stack || 1) + '/' + card._maxStack;
           info.appendChild(stackSpan);
         }
 
-        // 灵咒标签（仅自己可见）
-        if ((own || solo) && card.curses && card.curses.length) {
+        // 灵咒标签（本人可点开管理；观众只读查看）
+        if (canView && card.curses && card.curses.length) {
           const curseTags = document.createElement('div');
           curseTags.className = 'card-list-item__curses';
           card.curses.forEach(c => {
@@ -131,12 +145,14 @@
             tag.className = 'card-list-curse-tag';
             tag.dataset.curseName = c.name;
             tag.textContent = '⛓️' + c.name + '×' + c.layers;
-            tag.addEventListener('click', (e) => {
-              e.stopPropagation();
-              if (typeof openCursePanel === 'function' && typeof _curseTargetForCard === 'function') {
-                openCursePanel(_curseTargetForCard(playerId, card, '启悟区中的'));
-              }
-            });
+            if (own || solo) {
+              tag.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (typeof openCursePanel === 'function' && typeof _curseTargetForCard === 'function') {
+                  openCursePanel(_curseTargetForCard(playerId, card, '启悟区中的'));
+                }
+              });
+            }
             curseTags.appendChild(tag);
           });
           info.appendChild(curseTags);

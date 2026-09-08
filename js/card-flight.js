@@ -410,8 +410,8 @@ const CardFlight = (() => {
 
       master.set(overlay, { hidden: true }, flightStart + 0.6);
     } else {
-      // 无目标：手机端 1.5 秒后渐隐消失，桌面端 6 秒
-      const holdTime = isMobile ? 1.5 : 6.8;
+      // 无目标：手机端 1.5 秒后渐隐消失，桌面端 3 秒
+      const holdTime = isMobile ? 1.5 : 3;
       master.to(preview, {
         scale: 0.9, opacity: 0,
         duration: 0.4, ease: 'power2.in'

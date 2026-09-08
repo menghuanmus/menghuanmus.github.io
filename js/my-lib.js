@@ -178,6 +178,7 @@ var MyLib = (function () {
       '<div class="diy-row">' +
       fieldHTML('等级', 'diy-f-level', '<select id="diy-f-level"><option>1</option><option>2</option><option>3</option></select>', true) +
       fieldHTML('类型', 'diy-f-type', '<select id="diy-f-type">' + CARD_TYPES.map(function (t) { return '<option value="' + t[0] + '">' + t[1] + '</option>'; }).join('') + '</select>', true) +
+      fieldHTML('稀有度', 'diy-f-rarity', '<select id="diy-f-rarity"><option value="R">R</option><option value="SR">SR</option><option value="SSR">SSR</option></select>', true) +
       '</div>',
       '<div class="diy-row">' +
       '<label class="diy-field diy-check"><input type="checkbox" id="diy-f-awakened"><span style="display:inline;margin:0;">觉醒</span></label>' +
@@ -226,6 +227,7 @@ var MyLib = (function () {
     $('diy-f-owner').value = (unit && unit.owner) || '';
     $('diy-f-level').value = (unit && unit.level) || '1';
     $('diy-f-type').value = (unit && unit.type && ['spell', 'battle', 'form', 'realm'].indexOf(unit.type) !== -1) ? unit.type : 'spell';
+    $('diy-f-rarity').value = (unit && ['R', 'SR', 'SSR'].indexOf(unit.rarity) !== -1) ? unit.rarity : 'R';
     $('diy-f-awakened').checked = !!(unit && unit.awakened);
     $('diy-f-derivative').checked = !!(unit && unit.derivative);
     $('diy-f-text').value = (unit && unit.effect) || '';
@@ -246,6 +248,7 @@ var MyLib = (function () {
         type: type,
         owner: $('diy-f-owner').value.trim(),
         level: level,
+        rarity: $('diy-f-rarity').value,
         awakened: $('diy-f-awakened').checked,
         derivative: $('diy-f-derivative').checked,
         effect: $('diy-f-text').value.trim(),
@@ -345,6 +348,8 @@ var MyLib = (function () {
     } else if (kind === 'card') {
       var typeNames = { spell: '法术', battle: '战斗', form: '形态', realm: '幻境' };
       var typeLabel = (typeNames[unit.type] || unit.type) + (unit.level ? '·Lv' + unit.level : '');
+      var rar = (unit.rarity && ['R', 'SR', 'SSR'].indexOf(unit.rarity) !== -1) ? unit.rarity : 'R';
+      tags += '<span class="diy-tag diy-tag--rar-' + esc(rar.toLowerCase()) + '">' + esc(rar) + '</span>';
       tags += '<span class="diy-tag diy-tag--' + esc(unit.type) + '">' + esc(typeLabel) + '</span>';
       if (unit.owner) tags += '<span class="diy-tag">' + esc(unit.owner) + '</span>';
       if (unit.awakened) tags += '<span class="diy-tag diy-tag--awakened">觉醒</span>';
@@ -480,6 +485,8 @@ var MyLib = (function () {
       if (unit.type === 'summon' && unit.owner) meta.push(pill('所属：' + unit.owner));
       effect = unit.ability || '';
     } else if (kind === 'card') {
+      var rarP = (unit.rarity && ['R', 'SR', 'SSR'].indexOf(unit.rarity) !== -1) ? unit.rarity : 'R';
+      meta.push(pill(rarP, 'diy-tag--rar-' + rarP.toLowerCase()));
       var typeLabel = (typeNames[unit.type] || unit.type) + (unit.level ? '·Lv' + unit.level : '');
       meta.push(pill(typeLabel, 'diy-tag--' + unit.type));
       if (unit.owner) meta.push(pill('所属：' + unit.owner));

@@ -95,7 +95,24 @@
     }
 
     function parseCardLines(text) {
-      return text.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
+      const out = [];
+      String(text || '').split(/\r?\n/).forEach(line => {
+        const s = line.trim();
+        if (!s) return;
+        // 整行就是【式神名】区段标记（标记之后各行/牌归它）
+        const sec = s.match(/^【(.+)】$/);
+        if (sec) { out.push(s); return; }
+        // 行首带【式神名】且同行也要导牌，例如：【式神A】11 2  33
+        const head = s.match(/^【(.+)】\s*(.*)$/);
+        if (head) {
+          out.push('【' + head[1] + '】');
+          if (head[2].trim()) out.push(...head[2].trim().split(/\s+/));
+          return;
+        }
+        // 普通行：空格分隔多张牌（无论多少空格都算一个分隔），换行即下一行
+        out.push(...s.split(/\s+/));
+      });
+      return out;
     }
 
     /** 手牌/牌库计数按钮文案：手机端有牌时两行（括号+数字在下排） */
@@ -129,11 +146,10 @@
       if (addHandBtn)  addHandBtn.disabled  = lockActions;
       if (addDeckBtn)  addDeckBtn.disabled  = lockActions;
       if (importBtn)   importBtn.disabled   = lockActions;
-      // 启悟区按钮：锁定 + 牌数显示（与手牌/牌库一致）
+      // 启悟区按钮：观众也可点开查看（只读），操作按钮仅本人
       const oracleBtn = zone.querySelector('.btn-deck--oracle');
       if (oracleBtn) {
-        if (lockActions) oracleBtn.disabled = true;
-        else oracleBtn.disabled = false;
+        oracleBtn.disabled = lockActions && !spec;
         const oracleCount = (typeof oracleHands !== 'undefined' && oracleHands && Array.isArray(oracleHands[playerId])) ? oracleHands[playerId].length : 0;
         const isMobile = window.matchMedia('(max-width: 768px)').matches;
         if (isMobile) {
@@ -157,7 +173,7 @@
       updateDeckButtons('2');
     }
 
-    function openCardTextDialog({ title, placeholder, multiline, onConfirm, hideQuantity, showLevel, deckPlacement, priorityOption, priceOption, rawQuantity }) {
+    function openCardTextDialog({ title, placeholder, multiline, onConfirm, hideQuantity, showLevel, deckPlacement, priorityOption, priceOption, rawQuantity, showHelp }) {
       cardTextContext = { onConfirm, deckPlacement: !!deckPlacement, rawQuantity: !!rawQuantity };
       cardTextTitle.textContent = title;
       cardTextInput.value = '';
@@ -191,6 +207,9 @@
       const placementRow = document.getElementById('card-text-placement-row');
       if (actionsRow) actionsRow.hidden = !!deckPlacement;
       if (placementRow) placementRow.hidden = !deckPlacement;
+      // 导入模式才显示「导入格式」说明按钮
+      const helpBtn = document.getElementById('card-text-help-btn');
+      if (helpBtn) helpBtn.hidden = !showHelp;
       cardTextInput.focus();
     }
 
@@ -1440,19 +1459,29 @@
       const rawNames = parseCardLines(text);
       if (!rawNames.length) return;
       // 支持【式神名】区段：区段内未命中的牌优先在玩家库中匹配该式神
+      // 支持重复写法：卡名x2 / 卡名X9（x 与 X 均可）＝导入多张
       const myPid = (typeof localPlayerId !== 'undefined' && localPlayerId) ? String(localPlayerId) : '1';
       let sectionOwner = '';
       let unresolved = 0;
       const names = [];
-      rawNames.forEach(function(line) {
-        const sec = line.match(/^【(.+)】$/);
+      rawNames.forEach(function(tok) {
+        const sec = tok.match(/^【(.+)】$/);
         if (sec) { sectionOwner = sec[1].trim(); return; }
-        names.push(line);
-        let resolved = (typeof CardDB !== 'undefined' && CardDB.isOfficialName) ? CardDB.isOfficialName(line) : false;
-        if (!resolved && typeof CardDB !== 'undefined' && CardDB.findInPlayerLib) {
-          resolved = !!CardDB.findInPlayerLib(myPid, line, sectionOwner);
+        // 解析「卡名xN」：无 x/X 后缀时就是 1 张
+        const m = tok.match(/^(.+?)[xX](\d{1,2})$/);
+        const cardName = m ? m[1].trim() : tok;
+        let qty = 1;
+        if (m) {
+          qty = parseInt(m[2], 10);
+          if (Number.isNaN(qty) || qty < 1) qty = 1;
+          if (qty > 99) qty = 99;
         }
-        if (!resolved) unresolved++;
+        let resolved = (typeof CardDB !== 'undefined' && CardDB.isOfficialName) ? CardDB.isOfficialName(cardName) : false;
+        if (!resolved && typeof CardDB !== 'undefined' && CardDB.findInPlayerLib) {
+          resolved = !!CardDB.findInPlayerLib(myPid, cardName, sectionOwner);
+        }
+        if (!resolved) unresolved += qty;
+        for (let i = 0; i < qty; i++) names.push(cardName);
       });
       const cards = shuffleCards(names.map(name => createCard(name)));
       getPlayerCardState(playerId).deck.push(...cards);
@@ -1599,9 +1628,10 @@
         case 'import-deck':
           openCardTextDialog({
             title: `${playerName} 导入卡组`,
-            placeholder: '每行一张牌，例如：\n【式神A】\nXXX\nAAA\nCCC\n上述表示下面的牌都所属式神A',
+            placeholder: '在这里输入或粘贴要导入的卡组…',
             multiline: true,
             hideQuantity: true,
+            showHelp: true,
             onConfirm: (text) => importDeck(playerId, text),
           });
           break;
@@ -1641,6 +1671,16 @@
 
     document.getElementById('card-text-dialog-cancel').addEventListener('click', closeCardTextDialog);
     document.getElementById('card-text-dialog-confirm').addEventListener('click', confirmCardTextDialog);
+    // 导入格式说明抽屉：按钮打开 / ✕与遮罩关闭 / Esc关闭
+    (function() {
+      const helpBtn = document.getElementById('card-text-help-btn');
+      const ov = document.getElementById('import-help-overlay');
+      const closeBtn = document.getElementById('import-help-close');
+      if (helpBtn) helpBtn.addEventListener('click', () => { if (ov) ov.hidden = false; });
+      if (closeBtn) closeBtn.addEventListener('click', () => { if (ov) ov.hidden = true; });
+      if (ov) ov.addEventListener('click', (e) => { if (e.target === ov) ov.hidden = true; });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && ov && !ov.hidden) ov.hidden = true; });
+    })();
     // 置入牌库放置按钮（顶/底/随机）与取消
     document.querySelectorAll('.card-text-placement-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -3620,6 +3660,21 @@
       _searchRenderResults();
     }
 
+    /** 检索结果：取卡牌的等级/类型/稀有度标签（查库优先，牌面兜底；没有的不显示） */
+    function _searchCardMeta(card) {
+      if (!card || typeof card !== 'object') return '';
+      const db = (typeof CardDB !== 'undefined' && CardDB.lookup) ? CardDB.lookup(card.name) : null;
+      const lv = (db && db.level != null) ? db.level : card.level;
+      const tp = (db && db.type) ? db.type : card.type;
+      const rr = (db && db.rarity) ? db.rarity : card.rarity;
+      const out = [];
+      if (lv === 1 || lv === 2 || lv === 3) out.push('Lv.' + lv);
+      const tnames = { battle: '战斗', spell: '法术', realm: '幻境', form: '形态' };
+      if (tp && tnames[tp]) out.push(tnames[tp]);
+      if (rr === 'R' || rr === 'SR' || rr === 'SSR') out.push(rr);
+      return out.map(function(t) { return '<span class="search-item__tag">' + escapeHTML(t) + '</span>'; }).join('');
+    }
+
     function _searchRenderResults() {
       const body = document.getElementById('search-body');
       const endBtn = document.getElementById('search-end-btn');
@@ -3632,9 +3687,13 @@
       }
       let html = '';
       searchResults.forEach(function(card, i) {
+        const tags = _searchCardMeta(card);
         html += `<div class="search-item">
           <span class="search-item__no">${i + 1}</span>
-          <span class="search-item__name">${escapeHTML(card.name || '未知卡牌')}</span>
+          <div class="search-item__main">
+            <span class="search-item__name">${escapeHTML(card.name || '未知卡牌')}</span>
+            ${tags ? '<span class="search-item__tags">' + tags + '</span>' : ''}
+          </div>
           <span class="search-item__btns">
             <button type="button" class="search-item-btn search-item-btn--use" data-si="${i}" data-act="use">使用</button>
             <button type="button" class="search-item-btn" data-si="${i}" data-act="hand">加入手牌</button>
@@ -3664,7 +3723,8 @@
       } finally {
         window._searchUseInProgress = false;
       }
-      broadcastSystemMsg(`【系统】${getPlayerName(pid)}从牌库通过${searchMethod}检索使用了卡牌${card.name}`);
+      // 使用牌双方都能看到，公开播报具体牌名（「」内牌名自动高亮可点击查看）
+      broadcastSystemMsg(`【系统】${getPlayerName(pid)}通过检索从牌库使用了卡牌「${card.name}」`);
       _searchDropCard(card);
     }
 

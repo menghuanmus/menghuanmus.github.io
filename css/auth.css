@@ -969,6 +969,10 @@
 .diy-tag--battle { background: rgba(255,116,116,0.16); color: #ffa8a8; }
 .diy-tag--form   { background: rgba(80,214,160,0.16); color: #8fe8c9; }
 .diy-tag--realm  { background: rgba(178,132,255,0.16); color: #cfaeff; }
+/* 稀有度三色 */
+.diy-tag--rar-r   { background: rgba(110,150,220,0.16); color: #9fc0ff; }
+.diy-tag--rar-sr  { background: rgba(178,132,255,0.18); color: #d2b8ff; }
+.diy-tag--rar-ssr { background: rgba(255,180,60,0.2);   color: #ffd88a; }
 /* 工具栏 / 搜索 / 页签 */
 .diy-toolbar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 12px; }
 .diy-search-row { margin-bottom: 10px; }

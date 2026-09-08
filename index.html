@@ -5,21 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>百闻牌模拟器</title>
   <!-- CSS 模块 -->
-  <link rel="stylesheet" href="css/reset.css?v=v0.5.1">
-  <link rel="stylesheet" href="css/center-bar.css?v=v0.5.1">
-  <link rel="stylesheet" href="css/field.css?v=v0.5.1">
-  <link rel="stylesheet" href="css/chat.css?v=v0.5.1">
-  <link rel="stylesheet" href="css/room.css?v=v0.5.1">
-  <link rel="stylesheet" href="css/systems.css?v=v0.5.1">
-  <link rel="stylesheet" href="css/special-effects.css?v=v0.5.1">
-  <link rel="stylesheet" href="css/card-flight.css?v=v0.5.1">
-  <link rel="stylesheet" href="css/renyin.css?v=v0.5.1">
-  <link rel="stylesheet" href="css/show-hand.css?v=v0.5.1">
-  <link rel="stylesheet" href="css/charge.css?v=v0.5.1">
-  <link rel="stylesheet" href="css/bonus-panel.css?v=v0.5.1">
-  <link rel="stylesheet" href="css/presets.css?v=v0.5.1">
-  <link rel="stylesheet" href="css/auth.css?v=v0.5.1">
-  <link rel="stylesheet" href="css/mobile.css?v=v0.5.1">
+  <link rel="stylesheet" href="css/reset.css?v=v0.5.2">
+  <link rel="stylesheet" href="css/center-bar.css?v=v0.5.2">
+  <link rel="stylesheet" href="css/field.css?v=v0.5.2">
+  <link rel="stylesheet" href="css/chat.css?v=v0.5.2">
+  <link rel="stylesheet" href="css/room.css?v=v0.5.2">
+  <link rel="stylesheet" href="css/systems.css?v=v0.5.2">
+  <link rel="stylesheet" href="css/special-effects.css?v=v0.5.2">
+  <link rel="stylesheet" href="css/card-flight.css?v=v0.5.2">
+  <link rel="stylesheet" href="css/renyin.css?v=v0.5.2">
+  <link rel="stylesheet" href="css/show-hand.css?v=v0.5.2">
+  <link rel="stylesheet" href="css/charge.css?v=v0.5.2">
+  <link rel="stylesheet" href="css/bonus-panel.css?v=v0.5.2">
+  <link rel="stylesheet" href="css/presets.css?v=v0.5.2">
+  <link rel="stylesheet" href="css/auth.css?v=v0.5.2">
+  <link rel="stylesheet" href="css/mobile.css?v=v0.5.2">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
   <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
 </head>
@@ -646,7 +646,10 @@
 
   <div class="speak-dialog-overlay" id="card-text-dialog-overlay" hidden>
     <div class="speak-dialog" role="dialog" aria-labelledby="card-text-dialog-title">
-      <h3 id="card-text-dialog-title">输入</h3>
+      <div class="card-text-title-row">
+        <h3 id="card-text-dialog-title">输入</h3>
+        <button type="button" class="card-text-help-btn" id="card-text-help-btn" hidden>❓ 导入格式</button>
+      </div>
       <textarea id="card-text-dialog-input" placeholder="输入内容…" rows="5"></textarea>
       <div class="card-text-quantity-row">
         <span class="card-text-quantity-label">置入数量：</span>
@@ -677,6 +680,50 @@
         <button type="button" class="btn-dialog-confirm card-text-placement-btn" data-placement="bottom">置入牌库底</button>
         <button type="button" class="btn-dialog-confirm card-text-placement-btn" data-placement="random">置入牌库随机位置</button>
         <button type="button" class="btn-dialog-cancel card-text-placement-cancel">取消</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 导入卡组：格式说明（右侧拉出，手机端为弹窗） -->
+  <div class="import-help-overlay" id="import-help-overlay" hidden>
+    <div class="import-help-drawer" id="import-help-drawer">
+      <div class="import-help__header">
+        <span>📖 导入卡组格式说明</span>
+        <button type="button" class="btn-dialog-cancel" id="import-help-close">✕</button>
+      </div>
+      <div class="import-help__body">
+        <div class="import-help__tip">把卡组文字粘贴到输入框即可，支持下面的写法：</div>
+        <div class="import-help__section">1️⃣ 每行一张牌</div>
+        <pre class="import-help__code">不祥之刃
+见切
+战意</pre>
+
+        <div class="import-help__section">2️⃣ 一行多张牌（用空格隔开）</div>
+        <pre class="import-help__code">不祥之刃 见切     战意   一闪</pre>
+
+        <div class="import-help__section">3️⃣ 导入多张：牌名x张数（x 或 X 均可）</div>
+        <pre class="import-help__code">点燃x2
+圣子X2
+瞳炎x32</pre>
+
+        <div class="import-help__section">4️⃣ 【式神名】指定这些牌的所属式神</div>
+        <div class="import-help__tip" style="margin-bottom:4px;">· 独占一行 → 下面的牌都归该式神：</div>
+        <pre class="import-help__code">【妖刀姬】
+不祥之刃
+见切</pre>
+        <div class="import-help__tip" style="margin:10px 0 4px;">· 和牌在同一行 → 此行的牌归该式神：</div>
+        <pre class="import-help__code">【鸦天狗】正义必胜 英雄无畏</pre>
+
+        <div class="import-help__section">5️⃣ 混写示例</div>
+        <pre class="import-help__code">凤火
+引燃x2
+【妖刀姬】
+不祥之刃 见切x2  战意
+一闪X2
+【鸦天狗】正义必胜X2 英雄无畏
+追风</pre>
+
+        <div class="import-help__hint">无【式神名】的牌且不存在数据库时，其所属式神归为无所属/中立。导入后，可以在牌库-查看牌表中看到牌库构成。</div>
       </div>
     </div>
   </div>
@@ -935,7 +982,7 @@
   <!-- JS 模块（按依赖顺序加载） -->
   <!-- 卡牌数据从服务器加载：正式服 /ws/data/cards.js，测试服 /ws-test/data/cards.js。
        更新卡牌数据只需把 data/cards.js 上传到服务器，刷新页面即生效。
-       本地离线调试时可临时改回 <script src="data/cards.js?v=v0.5.1"></script> -->
+       本地离线调试时可临时改回 <script src="data/cards.js?v=v0.5.2"></script> -->
   <script>
     (function() {
       var isTest = false;
@@ -950,32 +997,33 @@
       document.write('<script src="' + src + '" onerror="console.error(\'卡牌数据加载失败，请检查服务器 cards.js 是否已部署\')"><\/script>');
     })();
   </script>
-  <script src="js/constants.js?v=v0.5.1"></script>
-  <script src="js/card-db.js?v=v0.5.1"></script>
-  <script src="js/card-tooltip.js?v=v0.5.1"></script>
-  <script src="js/card-flight.js?v=v0.5.1"></script>
-  <script src="js/network.js?v=v0.5.1"></script>
-  <script src="js/game-core.js?v=v0.5.1"></script>
-  <script src="js/chat.js?v=v0.5.1"></script>
-  <script src="js/dice.js?v=v0.5.1"></script>
-  <script src="js/card-deck.js?v=v0.5.1"></script>
-  <script src="js/shikigami-book.js?v=v0.5.1"></script>
-  <script src="js/data-io.js?v=v0.5.1"></script>
-  <script src="js/special-effects.js?v=v0.5.1"></script>
-  <script src="js/shop.js?v=v0.5.1"></script>
-  <script src="js/oracle.js?v=v0.5.1"></script>
-  <script src="js/renyin.js?v=v0.5.1"></script>
-  <script src="js/show-hand.js?v=v0.5.1"></script>
-  <script src="js/charge.js?v=v0.5.1"></script>
-  <script src="js/bonus-panel.js?v=v0.5.1"></script>
-  <script src="js/presets.js?v=v0.5.1"></script>
-  <script src="js/my-lib.js?v=v0.5.1"></script>
-  <script src="js/auth.js?v=v0.5.1"></script>
+  <script src="js/constants.js?v=v0.5.2"></script>
+  <script src="js/card-db.js?v=v0.5.2"></script>
+  <script src="js/card-tooltip.js?v=v0.5.2"></script>
+  <script src="js/card-flight.js?v=v0.5.2"></script>
+  <script src="js/network.js?v=v0.5.2"></script>
+  <script src="js/game-core.js?v=v0.5.2"></script>
+  <script src="js/chat.js?v=v0.5.2"></script>
+  <script src="js/dice.js?v=v0.5.2"></script>
+  <script src="js/card-deck.js?v=v0.5.2"></script>
+  <script src="js/shikigami-book.js?v=v0.5.2"></script>
+  <script src="js/data-io.js?v=v0.5.2"></script>
+  <script src="js/special-effects.js?v=v0.5.2"></script>
+  <script src="js/shop.js?v=v0.5.2"></script>
+  <script src="js/oracle.js?v=v0.5.2"></script>
+  <script src="js/renyin.js?v=v0.5.2"></script>
+  <script src="js/show-hand.js?v=v0.5.2"></script>
+  <script src="js/charge.js?v=v0.5.2"></script>
+  <script src="js/bonus-panel.js?v=v0.5.2"></script>
+  <script src="js/presets.js?v=v0.5.2"></script>
+  <script src="js/my-lib.js?v=v0.5.2"></script>
+  <script src="js/auth.js?v=v0.5.2"></script>
 
   </div><!-- /#game-view -->
 
 </body>
 </html>
+
 
 
 

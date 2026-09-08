@@ -207,6 +207,7 @@
       const item = document.createElement('div');
       item.className = 'effect-item';
       item.innerHTML = `
+        <button type="button" class="btn-effect-drag" title="按住拖动排序">⠿</button>
         <input type="text" class="effect-name" placeholder="名称/描述">
         <input type="text" class="effect-value" placeholder="数值">
         <button type="button" class="btn-remove-effect">移除</button>
@@ -224,9 +225,74 @@
       if (typeof isSpectator !== 'undefined' && isSpectator) {
         item.querySelector('.btn-remove-effect').disabled = true;
         item.querySelector('.btn-remove-effect').style.opacity = '0.4';
+        item.querySelector('.btn-effect-drag').disabled = true;
+        item.querySelector('.btn-effect-drag').style.opacity = '0.35';
         item.querySelectorAll('input').forEach(inp => { inp.readOnly = true; inp.style.opacity = '0.6'; });
       }
       return item;
+    }
+
+    // ---- 幻境/效果 拖动排序（按住条目前方手柄换序） ----
+    function _initEffectsPanelDrag(panel) {
+      if (panel.dataset.effectDragInit) return;
+      panel.dataset.effectDragInit = '1';
+      let grip = null, dragItem = null;
+      const itemSelector = ':scope > .effect-item';
+      const items = () => Array.from(panel.querySelectorAll(itemSelector));
+
+      function endDrag(commit) {
+        if (!dragItem) return;
+        const spec = (typeof isSpectator !== 'undefined' && isSpectator);
+        if (commit && !spec) {
+          const playerId = panel.closest('.player-zone')?.dataset.player;
+          if (playerId && typeof syncEffectsState === 'function') syncEffectsState(playerId);
+        }
+        dragItem.classList.remove('effect-dragging');
+        if (grip) { grip.style.cursor = ''; }
+        dragItem = null; grip = null;
+        document.removeEventListener('pointermove', onMove, true);
+        document.removeEventListener('pointerup', onUp, true);
+        document.removeEventListener('pointercancel', onUp, true);
+      }
+      function onMove(e) {
+        if (!dragItem) return;
+        e.preventDefault();
+        const y = e.clientY;
+        const list = items();
+        const cur = list.indexOf(dragItem);
+        if (cur < 0) return;
+        const rect = dragItem.getBoundingClientRect();
+        // 向上拖：把拖动项逐个挪到指针上方的条目之前
+        if (y < rect.top) {
+          for (let i = cur - 1; i >= 0; i--) {
+            if (y < list[i].getBoundingClientRect().bottom) list[i].before(dragItem);
+            else break;
+          }
+        } else if (y > rect.bottom) {
+          // 向下拖：把拖动项逐个挪到指针下方的条目之后
+          for (let i = cur + 1; i < list.length; i++) {
+            if (y > list[i].getBoundingClientRect().top) list[i].after(dragItem);
+            else break;
+          }
+        }
+      }
+      function onUp() { endDrag(true); }
+      function startDrag(g, item) {
+        if (typeof isSpectator !== 'undefined' && isSpectator) return;
+        grip = g; dragItem = item;
+        item.classList.add('effect-dragging');
+        document.addEventListener('pointermove', onMove, true);
+        document.addEventListener('pointerup', onUp, true);
+        document.addEventListener('pointercancel', onUp, true);
+      }
+      panel.addEventListener('pointerdown', (e) => {
+        const g = e.target.closest('.btn-effect-drag');
+        if (!g || !panel.contains(g)) return;
+        const item = g.closest('.effect-item');
+        if (!item) return;
+        e.preventDefault();
+        startDrag(g, item);
+      });
     }
 
     document.querySelectorAll('.btn-add-effect').forEach(btn => {
@@ -240,6 +306,9 @@
         broadcastSystemMsg(`【系统】${getPlayerName(zone.dataset.player)}添加了幻境/效果`);
       });
     });
+
+    // 为两个幻境/效果面板挂上拖拽排序委托
+    document.querySelectorAll('.effects-panel').forEach(panel => _initEffectsPanelDrag(panel));
 
     // ---- JS-1.6b：特定效果「堆叠上限：卡牌名」 ----
 

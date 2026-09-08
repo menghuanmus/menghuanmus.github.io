@@ -409,6 +409,10 @@
   .player-zone.realm-open .effect-item {
     margin-bottom: 6px;
   }
+  /* 手机端幻境/效果： */
+  .effect-item input.effect-value { width: 50px; }
+  /* 手机端拖拽手柄加宽，更好点按 */
+  .effect-item .btn-effect-drag { width: 22px; }
 
   /* 玩家信息条：头像缩小、血量缩小、鬼火图标缩小 */
   .player-id-area {

@@ -1,8 +1,8 @@
 // ================================================================
-//  js/renyin.js — 连引系统（五步筛选面板）
+//  js/renyin.js — 连引系统（六步筛选面板）
 //  步骤1: 选择连引对象式神  步骤2: 设定各对象数量
 //  步骤3: 筛选等级          步骤4: 筛选类型
-//  步骤5: 标签过滤（必须全含 / 至少含一）
+//  步骤5: 筛选稀有度        步骤6: 标签过滤（必须全含 / 至少含一）
 //  依赖: CardDB, game-core (战场卡槽), card-deck, chat
 // ================================================================
 
@@ -15,6 +15,8 @@ const Renyin = (() => {
   const LEVELS = ['1级', '2级', '3级', '其他'];
   const TYPES = ['战斗', '法术', '形态', '幻境', '其他'];
   const BASIC_TYPES = ['战斗', '法术', '形态', '幻境'];
+  const RARITIES = ['R', 'SR', 'SSR', '其他'];
+  const BASIC_RARITIES = ['R', 'SR', 'SSR'];
   const TYPE_MAP = { 'battle':'战斗','spell':'法术','form':'形态','realm':'幻境','shikigami':'式神','summon':'召唤物','curse':'灵咒','bond':'协战' };
 
   /** 英→中 卡牌类型 */
@@ -95,16 +97,17 @@ const Renyin = (() => {
     const quantities = targets.map(() => 0);
     quantities[defaultSelectedIdx] = 1;
 
-    // 默认全选等级与类型（含「其他」）
+    // 默认全选等级、类型、稀有度（均含「其他」）
     const levelSelected = new Set([1, 2, 3, 4]);
     const typeSelected = new Set(TYPES);
+    const rarSelected = new Set(RARITIES);
     const must = { keywords: [], cards: [], descs: [] };
     const any = { keywords: [], cards: [], descs: [] };
 
     ctx = {
       playerId, card,
       targets, totalCount, selectedIndices, quantities,
-      levelSelected, typeSelected,
+      levelSelected, typeSelected, rarSelected,
       must, any,
       phase: 'conditions',
       foundCards: [], selectedIndex: -1,
@@ -188,9 +191,19 @@ const Renyin = (() => {
           }).join('')}
         </div>
       </div>
-      <!-- 步骤5 -->
+      <!-- 步骤5（新增）：稀有度 -->
       <div class="renyin-step">
-        <div class="renyin-step__label">🏷 第五步：标签过滤 <span class="renyin-step__hint">（关键词 / 卡牌名 / 描述）</span></div>
+        <div class="renyin-step__label">💎 第五步：稀有度 <span class="renyin-step__hint">（选择1-4个）</span></div>
+        <div class="renyin-btn-group" id="renyin-rarities">
+          ${RARITIES.map(r => {
+            const active = ctx.rarSelected.has(r) ? ' renyin-opt-btn--active' : '';
+            return `<span class="renyin-opt-btn${active}" data-rar="${r}">${r}</span>`;
+          }).join('')}
+        </div>
+      </div>
+      <!-- 步骤6 -->
+      <div class="renyin-step">
+        <div class="renyin-step__label">🏷 第六步：标签过滤 <span class="renyin-step__hint">（关键词 / 卡牌名 / 描述）</span></div>
         <div class="renyin-filter-block">
           <div class="renyin-filter-block__label">🔒 必须全含（以下所有条件都要满足）</div>
           <div class="renyin-filter-btns">
@@ -291,6 +304,13 @@ const Renyin = (() => {
       btn.addEventListener('click', () => {
         const type = btn.dataset.type;
         ctx.typeSelected[ctx.typeSelected.has(type) ? 'delete' : 'add'](type);
+        btn.classList.toggle('renyin-opt-btn--active');
+      });
+    });
+    body.querySelectorAll('#renyin-rarities .renyin-opt-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const r = btn.dataset.rar;
+        ctx.rarSelected[ctx.rarSelected.has(r) ? 'delete' : 'add'](r);
         btn.classList.toggle('renyin-opt-btn--active');
       });
     });
@@ -456,6 +476,9 @@ const Renyin = (() => {
     if (ctx.typeSelected.size === 0) {
       errors.push({ el: document.getElementById('renyin-types'), msg: '请至少选择一个类型' });
     }
+    if (ctx.rarSelected.size === 0) {
+      errors.push({ el: document.getElementById('renyin-rarities'), msg: '请至少选择一个稀有度' });
+    }
 
     if (errors.length > 0) {
       errors.forEach(err => {
@@ -527,7 +550,17 @@ const Renyin = (() => {
           });
         }
 
-        // 第五步条件过滤（关键词 / 卡牌名 / 描述）
+        // 稀有度（「其他」= R/SR/SSR 之外，如未标注稀有度的DIY卡）
+        if (ctx.rarSelected.size > 0 && ctx.rarSelected.size < RARITIES.length) {
+          pool = pool.filter(c => {
+            const db = CardDB.lookup(c.name);
+            const rr = (db && db.rarity) ? db.rarity : (c.rarity || '其他');
+            if (BASIC_RARITIES.includes(rr)) return ctx.rarSelected.has(rr);
+            return ctx.rarSelected.has('其他');
+          });
+        }
+
+        // 第六步条件过滤（关键词 / 卡牌名 / 描述）
         pool = filterByConditions(pool);
 
         // 随机抽
@@ -607,6 +640,8 @@ const Renyin = (() => {
             const dbCard = CardDB.lookup(cName);
             const tagsText = dbCard ? [cnType(dbCard.type), dbCard.faction].filter(Boolean).join('/') : '';
             const levelText = dbCard ? (dbCard.level || 1) + '级' : '';
+            const rarityRaw = (dbCard && dbCard.rarity) ? dbCard.rarity : (c.rarity || '');
+            const rarityText = (rarityRaw === 'R' || rarityRaw === 'SR' || rarityRaw === 'SSR') ? rarityRaw : '其他';
             const selClass = ctx.selectedIndex === idx ? ' renyin-result-card--selected' : '';
             const usedClass = item.isUsed ? ' renyin-result-card--used' : '';
             // 灵咒显示（支持悬停浮窗，与卡牌浮窗不冲突）
@@ -618,6 +653,7 @@ const Renyin = (() => {
                 ${tagsText ? `<div class="renyin-result-card__tags">${tagsText}</div>` : ''}
                 ${cursesHtml}
               </div>
+              ${rarityText ? `<span class="renyin-result-card__badge">${rarityText}</span>` : ''}
               ${levelText ? `<span class="renyin-result-card__badge">${levelText}</span>` : ''}
               ${item.isUsed ? '<span class="renyin-result-card__badge" style="background:rgba(160,100,220,0.3);color:#d4b8f0;">使用的牌</span>' : ''}
               ${!item.isUsed && item.from ? `<span class="renyin-result-card__badge" style="background:rgba(80,140,180,0.2);color:#a0d0e0;">${item.from}</span>` : ''}

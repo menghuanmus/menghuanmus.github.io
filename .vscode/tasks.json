@@ -106,6 +106,78 @@
 			"type": "shell",
 			"command": "Set-Location \"d:\\DIY\\百闻牌\\百闻牌模拟器\\menghuanmus.github.io\"; node --check js\\card-tooltip.js; if ($LASTEXITCODE -ne 0) { exit 1 }; node --check js\\card-flight.js; if ($LASTEXITCODE -ne 0) { exit 1 }; node --check js\\card-deck.js; if ($LASTEXITCODE -ne 0) { exit 1 }; Write-Output \"OK\"",
 			"problemMatcher": []
+		},
+		{
+			"label": "bwpemu-check-4feat",
+			"type": "shell",
+			"command": "Set-Location \"d:\\DIY\\百闻牌\\百闻牌模拟器\\menghuanmus.github.io\"; node --check js\\game-core.js; if ($LASTEXITCODE -ne 0) { exit 1 }; node --check js\\card-deck.js; if ($LASTEXITCODE -ne 0) { exit 1 }; node --check js\\oracle.js; if ($LASTEXITCODE -ne 0) { exit 1 }; node --check js\\my-lib.js; if ($LASTEXITCODE -ne 0) { exit 1 }; Write-Output \"OK\"",
+			"problemMatcher": []
+		},
+		{
+			"label": "bwpemu-check-network",
+			"type": "shell",
+			"command": "Set-Location \"d:\\DIY\\百闻牌\\百闻牌模拟器\\menghuanmus.github.io\"; node --check js\\network.js; if ($LASTEXITCODE -ne 0) { exit 1 }; Write-Output \"OK\"",
+			"problemMatcher": []
+		},
+		{
+			"label": "bwpemu-check-oracle2",
+			"type": "shell",
+			"command": "Set-Location \"d:\\DIY\\百闻牌\\百闻牌模拟器\\menghuanmus.github.io\"; node --check js\\oracle.js; if ($LASTEXITCODE -ne 0) { exit 1 }; Write-Output \"OK\"",
+			"problemMatcher": []
+		},
+		{
+			"label": "bwpemu-check-searchtags",
+			"type": "shell",
+			"command": "Set-Location \"d:\\DIY\\百闻牌\\百闻牌模拟器\\menghuanmus.github.io\"; node --check js\\card-deck.js; if ($LASTEXITCODE -ne 0) { exit 1 }; Write-Output \"OK\"",
+			"problemMatcher": []
+		},
+		{
+			"label": "bwpemu-check-searchuse",
+			"type": "shell",
+			"command": "Set-Location \"d:\\DIY\\百闻牌\\百闻牌模拟器\\menghuanmus.github.io\"; node --check js\\card-deck.js; if ($LASTEXITCODE -ne 0) { exit 1 }; Write-Output \"OK\"",
+			"problemMatcher": []
+		},
+		{
+			"label": "bwpemu-check-searchuse2",
+			"type": "shell",
+			"command": "Set-Location \"d:\\DIY\\百闻牌\\百闻牌模拟器\\menghuanmus.github.io\"; node --check js\\card-deck.js; if ($LASTEXITCODE -ne 0) { exit 1 }; Write-Output \"OK\"",
+			"problemMatcher": []
+		},
+		{
+			"label": "bwpemu-check-searchuse3",
+			"type": "shell",
+			"command": "Set-Location \"d:\\DIY\\百闻牌\\百闻牌模拟器\\menghuanmus.github.io\"; node --check js\\card-deck.js; if ($LASTEXITCODE -ne 0) { exit 1 }; Write-Output \"OK\"",
+			"problemMatcher": []
+		},
+		{
+			"label": "bwpemu-check-renyin6",
+			"type": "shell",
+			"command": "Set-Location \"d:\\DIY\\百闻牌\\百闻牌模拟器\\menghuanmus.github.io\"; node --check js\\renyin.js; if ($LASTEXITCODE -ne 0) { exit 1 }; Write-Output \"OK\"",
+			"problemMatcher": []
+		},
+		{
+			"label": "bwpemu-check-renyin-rar",
+			"type": "shell",
+			"command": "Set-Location \"d:\\DIY\\百闻牌\\百闻牌模拟器\\menghuanmus.github.io\"; node --check js\\renyin.js; if ($LASTEXITCODE -ne 0) { exit 1 }; Write-Output \"OK\"",
+			"problemMatcher": []
+		},
+		{
+			"label": "bwpemu-check-import",
+			"type": "shell",
+			"command": "Set-Location \"d:\\DIY\\百闻牌\\百闻牌模拟器\\menghuanmus.github.io\"; node --check js\\card-deck.js; if ($LASTEXITCODE -ne 0) { exit 1 }; Write-Output \"OK\"",
+			"problemMatcher": []
+		},
+		{
+			"label": "bwpemu-check-helptext",
+			"type": "shell",
+			"command": "Set-Location \"d:\\DIY\\百闻牌\\百闻牌模拟器\\menghuanmus.github.io\"; node --check js\\card-deck.js; if ($LASTEXITCODE -ne 0) { exit 1 }; Write-Output \"OK\"",
+			"problemMatcher": []
+		},
+		{
+			"label": "bwpemu-check-xqty",
+			"type": "shell",
+			"command": "Set-Location \"d:\\DIY\\百闻牌\\百闻牌模拟器\\menghuanmus.github.io\"; node --check js\\card-deck.js; if ($LASTEXITCODE -ne 0) { exit 1 }; Write-Output \"OK\"",
+			"problemMatcher": []
 		}
 	]
 }

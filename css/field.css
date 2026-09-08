@@ -361,6 +361,28 @@
       background: #a04545;
     }
 
+    .btn-effect-drag {
+      flex-shrink: 0;
+      width: 6px;      margin-left: -6px;        /* 向左移 4px，贴近条目左缘 */      padding: 3px 0;
+      background: transparent;
+      border: none;
+      color: #8fa6c8;
+      font-size: 14px;
+      line-height: 1;
+      cursor: grab;
+      touch-action: none;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .btn-effect-drag:hover { color: #dcebff; }
+    .btn-effect-drag:active { cursor: grabbing; }
+    .btn-effect-drag:disabled { cursor: not-allowed; }
+    .effect-item.effect-dragging {
+      opacity: 0.65;
+      border-style: dashed;
+    }
+    .effect-item.effect-dragging input { pointer-events: none; }
+
     /* ================================================================
        战场中间区域（准备区 + 战斗区 + 牌库工具栏）
        ================================================================ */
